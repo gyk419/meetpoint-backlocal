@@ -2,17 +2,19 @@ package MeetPoint.meetpoint.Map.algorithm;
 
 import java.util.*;
 
-/****************
- * 240329 김준식
- * 중간지점 계산
- * **************/
+/********************
+ * 날짜 : 2024.03.29
+ * 이름 : 김준식
+ * 내용 : 중간지점
+ * ******************/
 public class MidPoint {
 
-     /****************************
-     * 무게중심(그라함 스캔 알고리즘)
-     * ***************************/
+     /***********************************
+      * 날짜 : 2024.03.29
+      * 이름 : 김준식
+      * 내용 : 무게중심(그라함 스캔 알고리즘)
+      * *********************************/
      public HashMap<String, Object> centerOfGravity(List<Double> latitude, List<Double> longitude) { // 위도(y), 경도(x)
-
          return grahamScan(latitude, longitude);
      }
 
@@ -24,23 +26,35 @@ public class MidPoint {
              this.lon = lon; // 경도 (x)
          }
      }
-     static Point startPoint = new Point(43.0, 132.0); // 시작 좌표
+     Point startPoint = new Point(0,0); // 시작 좌표
      HashMap<String, Object> grahamScan(List<Double> latitude, List<Double> longitude) {
          List<Point> points = new ArrayList<>(); // 좌표들을 저장할 변수
 
+         for(int i=0;i< latitude.size();i++){
+             if(latitude.get(i) > startPoint.lat ) {
+                 startPoint.lat = latitude.get(i);
+                 startPoint.lon = longitude.get(i);
+             } else if (latitude.get(i) == startPoint.lat) {
+                 if (longitude.get(i) > startPoint.lon) {
+                     startPoint.lon = longitude.get(i);
+                 }
+             }
+         }
+
          // 입력받은 경도와 위도를 리스트에 저장 - 예) [(위도,경도), (위도,경도), . . .]
          for(int i=0; i< latitude.size(); i++){
-             points.add(new Point(longitude.get(i), latitude.get(i))); // 각 위치 좌표 저장( 경도(x),위도(y) )
+             points.add(new Point(latitude.get(i), longitude.get(i))); // 각 위치 좌표 저장( 경도(x),위도(y) )
          }
 
          // 각 위치 중에서 y값이 가장 작은 값을 찾고 그 위치를 기준점으로 잡는다.
          // 위도 값이 가장 작은 값을 찾는다. 만약 위도값이 같을 경우 경도 값이 작은 값을 기준점으로 한다.
          for (MidPoint.Point point : points) {
              if (point.lat < startPoint.lat) {
-                 startPoint = point;
+                 startPoint.lat = point.lat;
+                 startPoint.lon = point.lon;
              } else if (point.lat == startPoint.lat) {
                  if (point.lon < startPoint.lon) {
-                     startPoint = point;
+                     startPoint.lon = point.lon;
                  }
              }
          }
@@ -104,9 +118,10 @@ public class MidPoint {
     HashMap<String, Object> centerCalculation(Stack<Point> stack){
          HashMap<String, Object> result = new HashMap<String, Object>();
          double latitude = 0, longitude = 0;
-         for(int i=0;i<stack.size(); i++){
-             latitude += stack.get(i).lat;
-             longitude += stack.get(i).lon;
+         for (Point point : stack) {
+
+             latitude += point.lat;
+             longitude += point.lon;
          }
          result.put("longitude",String.format("%.13f", (longitude/stack.size())));
          result.put("latitude",String.format("%.13f", (latitude/stack.size())));
