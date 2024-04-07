@@ -2,18 +2,18 @@ package MeetPoint.meetpoint.Map.algorithm;
 
 import java.util.*;
 
-/********************
- * 날짜 : 2024.03.29
- * 이름 : 김준식
+/**
+ * 작성일 : 2024.03.29
+ * 작성자 : 김준식
  * 내용 : 중간지점
- * ******************/
+ **/
 public class MidPoint {
 
-     /***********************************
-      * 날짜 : 2024.03.29
-      * 이름 : 김준식
+     /**
+      * 작성일 : 2024.03.29
+      * 작성자 : 김준식
       * 내용 : 무게중심(그라함 스캔 알고리즘)
-      * *********************************/
+      **/
      public HashMap<String, Object> centerOfGravity(List<Double> latitude, List<Double> longitude) { // 위도(y), 경도(x)
          return grahamScan(latitude, longitude);
      }
@@ -123,9 +123,34 @@ public class MidPoint {
              latitude += point.lat;
              longitude += point.lon;
          }
-         result.put("longitude",String.format("%.13f", (longitude/stack.size())));
-         result.put("latitude",String.format("%.13f", (latitude/stack.size())));
+         result.put("longitude",String.format("%.15f", (longitude/stack.size())));
+         result.put("latitude",String.format("%.15f", (latitude/stack.size())));
          return result;
+    }
+
+    /**
+     * 작성일 : 2024.04.07
+     * 작성자 : 김준식
+     * 내용 : 교통점수순
+     **/
+    public HashMap<String, Object> vehiclesScore(List<Double> latitude, List<Double> longitude, double lowScoreLat, double lowScoreLon) {
+        HashMap<String, Object> middlePoint = grahamScan(latitude, longitude); // 중간 좌표
+        HashMap<String, Object> result = new HashMap<>();
+        double mpLat = (Double.parseDouble((String) middlePoint.get("latitude")) + lowScoreLat) / 2; // 중간 좌표와 낮은 점주 좌표의 중간 위도값을 찾음 ( 명칭 : mp1 위도)
+        double mpLon = (Double.parseDouble((String) middlePoint.get("longitude")) + lowScoreLon) / 2; // 중간 좌표와 낮은 점수 좌표의 중간 경도값을 찾음 ( 명칭 : mp1 경도)
+        result.put("latitude",  mpLat);
+        result.put("longitude", mpLon);
+
+        result.replace("latitude",  (Double.parseDouble(result.get("latitude").toString()) + lowScoreLat) / 2); // mp1 위도와 낮은 점주 좌표의 중간 위도값을 찾음 ( 명칭 : mp2 위도)
+        result.replace("longitude", (Double.parseDouble(result.get("longitude").toString()) + lowScoreLon) / 2); // mp1 경도와 낮은 점수 좌표의 중간 경도값을 찾음 ( 명칭 : mp2 경도)
+
+        result.replace("latitude", (Double.parseDouble(result.get("latitude").toString()) + mpLat) / 2 );
+        result.replace("longitude", (Double.parseDouble(result.get("longitude").toString()) + mpLon) / 2 );
+
+        result.replace("latitude", (Double.parseDouble(result.get("latitude").toString()) + Double.parseDouble((String)middlePoint.get("latitude"))) / 2);
+        result.replace("longitude", (Double.parseDouble(result.get("longitude").toString()) + Double.parseDouble((String)middlePoint.get("longitude"))) / 2);
+
+        return result;
     }
 
 }
