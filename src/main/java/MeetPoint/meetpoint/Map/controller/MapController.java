@@ -26,12 +26,8 @@ public class MapController {
      * 내용 : 중간지점 좌표 계산 Controller
      **/
     @PostMapping("/mainPage")
-    public HashMap<String, Object> findCenterPoint(@RequestBody HashMap<String, List<Double>> params) {
-        System.out.println("findCenterPoint - 컨트롤러 실행");
-        System.out.println("parmas: " + params);
-        double re = params.get("calculation").get(0);
-        int option = (int)re;
-        return mapService.findCenterPoint(params.get("lat"), params.get("lon"), option);
+    public HashMap<String, Object> calCenterPoint(@RequestBody List<Object> params) {
+        System.out.println("findCenterPoint - Controller 실행");
+        return mapService.findCenterPoint(params);
     }
-
 }
