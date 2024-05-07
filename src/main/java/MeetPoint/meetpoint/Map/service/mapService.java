@@ -2,13 +2,17 @@ package MeetPoint.meetpoint.Map.service;
 
 import MeetPoint.meetpoint.Map.algorithm.MidPoint;
 import MeetPoint.meetpoint.Map.dao.MapDao;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Service
 public class mapService {
@@ -25,22 +29,27 @@ public class mapService {
      * 작성자 : 김준식
      * 내용 : 중간지점 좌표 계산 Service
      **/
-    public HashMap<String, Object> findCenterPoint(List<Object> params) {
+    public HashMap<String, Object> findCenterPoint(List<Object> params, HttpServletResponse response, HttpServletRequest request) {
         System.out.println("center - 서비스 실행");
+
         // 중간지점 계산 방식 옵션 저장 (1)거리순 (2)무게중심 (3)교통점수
         Integer option = (Integer) params.get(0);
+
         // 입력받은 여러 좌표의 위도, 경도 값을 각각 리스트로 저장
         List<HashMap<String, Object>> re = (List<HashMap<String, Object>>) params.get(1);
         List<Double> lat = new ArrayList<>(); // 위도
         List<Double> lon = new ArrayList<>(); // 경도
-        System.out.println("re : " + re);
+
+        // 쿠키에 저장할 여러 사용자의 이름, 주소를 리스트로 저장
+        List<String> users = new ArrayList<>();
+
         for(HashMap<String, Object> res : re) {
             HashMap<String, Object> position = (HashMap<String, Object>) res.get("position");
             lat.add(Double.parseDouble(position.get("y").toString()));
             lon.add(Double.parseDouble(position.get("x").toString()));
+            users.add(res.get("name").toString() + "=" + res.get("address") + "=" + position.get("address_name").toString() + "=" + position.get("y").toString() + "=" + position.get("x").toString() );
         }
-        System.out.println("lat : " + lat);
-        System.out.println("lon : " + lon);
+
         HashMap<String, Object> result = new HashMap<>();
         MidPoint midPoint = new MidPoint();
 
@@ -95,6 +104,98 @@ public class mapService {
             } else {
                 result = midPoint.vehiclesScore(lat, lon, sumLat, sumLon, optionValue);
             }
+        }
+
+        // 쿠키를 저장하기 전 기존에 쿠키가 존재하면 삭제
+        deleteCookie(response, request);
+
+        // 이름 및 위치 데이터 저장 및 쿠키에 저장
+        int usersLength = users.size();
+        for(int i = 1; i <= usersLength; i++){
+            String cookieName = "USER" + i; // 쿠키 이름을 사용자1, 사용자2, 사용자3, 사용자4 식으로 저장.
+            createCookie(response, cookieName, users.get(i-1)); // 쿠키 생성
+        }
+
+        // 쿠키 출력
+        Cookie[] cookies = request.getCookies();
+        try{
+            if(cookies != null){
+                for(Cookie cookie : cookies){
+                    if(cookie.getName().contains("USER")){
+                        // 쿠키에 사용자정보가 있을 경우
+                        System.out.println(cookie.getName() + " : " + URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
+
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+        return result;
+    }
+
+    /**
+     * 작성일 : 2024.05.01
+     * 작성자 : 김준식
+     * 내용 : 쿠키 생성
+     **/
+    public void createCookie(HttpServletResponse response, String cookieName, String cookieValue) { // 크키를 생성할 때 쿠키값은 인코딩하여 생성 (만약 인코딩이 지원되지 않는 경우 예외 발생)
+        try{
+            String urlEncodedCookieValue = URLEncoder.encode(cookieValue, StandardCharsets.UTF_8); // 쿠키값을 url 인코딩하여 저장
+            Cookie cookie = new Cookie(cookieName, urlEncodedCookieValue);
+            cookie.setMaxAge(24*60*60); // 쿠키 수명 24시간 (시간*분*초)
+            cookie.setPath("/");
+            response.addCookie(cookie);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * 작성일 : 2024.05.01
+     * 작성자 : 김준식
+     * 내용 : 쿠키 삭제
+     **/
+    public void deleteCookie(HttpServletResponse response, HttpServletRequest request){
+        try{
+            Cookie[] cookies = request.getCookies();
+            if(cookies != null){
+                for(Cookie cookie : cookies){
+                    if(cookie.getName().contains("USER")){
+                        // 쿠키에 사용자정보가 있을 경우
+                        cookie.setMaxAge(0);
+                        cookie.setPath("/");
+                        response.addCookie(cookie);
+                    }
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * 작성일 : 2024.05.05
+     * 작성자 : 김준식
+     * 내용 : 재탐색 Service
+     **/
+    public HashMap<String, Object> reSearchPoint( HashMap<String,Object> params){
+        Random random = new Random();
+        System.out.println("reSearchPoint - params : " + params);
+        HashMap<String ,Object> result = new HashMap<>();
+        try{
+            List<HashMap<String, Object>> ex = mapdao.reSearchPoint(params); // 시도, 시군구, 관광지 옵션들을 검색하여 여러 목록 값을 반환
+            int randomNumber = random.nextInt(ex.size()); // 0부터 데이터베이스에서 데이터를 가져온 갯수까지 숫자 중에서 랜덤으로 정수를 하나 생성
+            result = ex.get(randomNumber); // 랜덤으로 생성된 수로 관광지 장소 하나를 반환
+        } catch (Exception e) {
+            result = null; // 검색 결과가 없을 경우 null 반환
+            e.printStackTrace();
         }
 
         return result;
