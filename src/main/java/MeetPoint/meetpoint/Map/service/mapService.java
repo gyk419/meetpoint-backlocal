@@ -186,15 +186,17 @@ public class mapService {
      * 내용 : 재탐색 Service
      **/
     public HashMap<String, Object> reSearchPoint( HashMap<String,Object> params){
-        Random random = new Random();
+//        Random random = new Random();
         System.out.println("reSearchPoint - params : " + params);
         HashMap<String ,Object> result = new HashMap<>();
         try{
-            List<HashMap<String, Object>> ex = mapdao.reSearchPoint(params); // 시도, 시군구, 관광지 옵션들을 검색하여 여러 목록 값을 반환
-            int randomNumber = random.nextInt(ex.size()); // 0부터 데이터베이스에서 데이터를 가져온 갯수까지 숫자 중에서 랜덤으로 정수를 하나 생성
-            result = ex.get(randomNumber); // 랜덤으로 생성된 수로 관광지 장소 하나를 반환
+            result = mapdao.reSearchPoint(params);
+//            List<HashMap<String, Object>> ex = mapdao.reSearchPoint(params); // 시도, 시군구, 관광지 옵션들을 검색하여 여러 목록 값을 반환
+//            int randomNumber = random.nextInt(ex.size()); // 0부터 데이터베이스에서 데이터를 가져온 갯수까지 숫자 중에서 랜덤으로 정수를 하나 생성
+//            result = ex.get(randomNumber); // 랜덤으로 생성된 수로 관광지 장소 하나를 반환
+            System.out.println("result : " + result );
         } catch (Exception e) {
-            result = null; // 검색 결과가 없을 경우 null 반환
+            result.put("response", 0); // 검색 결과가 없을 경우 null 반환
             e.printStackTrace();
         }
 

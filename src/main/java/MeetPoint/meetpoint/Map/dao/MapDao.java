@@ -24,5 +24,6 @@ public interface MapDao {
      * 작성자 : 김준식
      * 내용 : 재탐색(사용자가 선택한 옵션에 맞는 관광지 검색 후 위도, 경도 반환)
      **/
-    List<HashMap<String, Object>> reSearchPoint(HashMap<String, Object> params);
+//    List<HashMap<String, Object>> reSearchPoint(HashMap<String, Object> params);
+    HashMap<String, Object> reSearchPoint(HashMap<String, Object> params);
 }

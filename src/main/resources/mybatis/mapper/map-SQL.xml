@@ -29,21 +29,33 @@
         SELECT POI_NM as Name,LC_LA as Latitude, LC_LO as Longitude
         FROM tour.a_tourist_spot
         WHERE
-            <choose>
-                <when test="num == 0 and region_1depth_name != '' and region_2depth_name == '' ">
-                    CTPRVN_NM = #{region_1depth_name}
-                </when>
-                <when test="num == 0 and region_2depth_name != '' and region_1depth_name != '' ">
-                    CTPRVN_NM = #{region_1depth_name} OR SIGNGU_NM = #{region_2depth_name}
-                </when>
-                <when test="num == 1 and region_1depth_name != '' and region_2depth_name != '' ">
-                    CTPRVN_NM = #{region_1depth_name} AND SIGNGU_NM = #{region_2depth_name}
-                </when>
-            </choose>
-            AND
+<!--            <choose>-->
+<!--                <when test="num == 0 and region_1depth_name != '' and region_2depth_name == '' ">-->
+<!--                    CTPRVN_NM = #{region_1depth_name}-->
+<!--                </when>-->
+<!--                <when test="num == 0 and region_2depth_name != '' and region_1depth_name != '' ">-->
+<!--                    CTPRVN_NM = #{region_1depth_name} OR SIGNGU_NM = #{region_2depth_name}-->
+<!--                </when>-->
+<!--                <when test="num == 1 and region_1depth_name != '' and region_2depth_name != '' ">-->
+<!--                    CTPRVN_NM = #{region_1depth_name} AND SIGNGU_NM = #{region_2depth_name}-->
+<!--                </when>-->
+<!--            </choose>-->
             <foreach collection="option" item="item"  separator="OR" >
-                CL_NM LIKE '%' || #{item} || '%'
+                <choose>
+                    <when test="num == 0 and region_1depth_name != '' and region_2depth_name == '' ">
+                        CTPRVN_NM = #{region_1depth_name}
+                    </when>
+                    <when test="num == 0 and region_2depth_name != '' and region_1depth_name != '' ">
+                        CTPRVN_NM = #{region_1depth_name} OR SIGNGU_NM = #{region_2depth_name}
+                    </when>
+                    <when test="num == 1 and region_1depth_name != '' and region_2depth_name != '' ">
+                        CTPRVN_NM = #{region_1depth_name} AND SIGNGU_NM = #{region_2depth_name}
+                    </when>
+                </choose>
+                AND CL_NM LIKE '%' || #{item} || '%'
             </foreach>
+        ORDER BY RANDOM()
+        LIMIT 1
     </select>
 
 </mapper>
