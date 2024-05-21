@@ -1,13 +1,11 @@
 package MeetPoint.meetpoint.Map.service;
 
 import MeetPoint.meetpoint.Map.dao.UserChoiceDao;
-import MeetPoint.meetpoint.Map.model.selectPlaceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 작성일 : 2024.05.17
