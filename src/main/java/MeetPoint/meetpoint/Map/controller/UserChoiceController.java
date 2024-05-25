@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * 작성일 : 2024.05.17
@@ -26,15 +25,7 @@ public class UserChoiceController {
      **/
     @PostMapping("/storePlace")
     public HashMap<String, Object> storePlace(@RequestBody HashMap<String, Object> params) {
-        System.out.println("UserChoice Controller 실행");
-        System.out.println("params : " + params);
         return userChoiceService.storePlace(params);
-    }
-
-    @PostMapping("/plan")
-    public void plan(@RequestBody HashMap<String, Object> params) {
-        System.out.println("plan - controller");
-        System.out.println("params : " + params);
     }
 
     /**
@@ -43,8 +34,7 @@ public class UserChoiceController {
      * 내용 : 선택한 장소 및 중간 지점 조회 Controller
      **/
     @PostMapping("selectPlace")
-    public HashMap<String, Object> selectPlace(@RequestBody HashMap<String, Integer> params){
-        System.out.println("selectPlace - Controller 실행");
+    public HashMap<String, Object> selectPlace(@RequestBody HashMap<String, Object> params){
         return userChoiceService.selectPlace(params);
     }
 }

@@ -9,13 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
-public class mapService {
+public class MapService {
 
     @Autowired
     MapDao mapdao;
@@ -30,7 +29,6 @@ public class mapService {
      * 내용 : 중간지점 좌표 계산 Service
      **/
     public HashMap<String, Object> findCenterPoint(List<Object> params, HttpServletResponse response, HttpServletRequest request) {
-        System.out.println("center - 서비스 실행");
 
         // 중간지점 계산 방식 옵션 저장 (1)거리순 (2)무게중심 (3)교통점수
         Integer option = (Integer) params.get(0);
@@ -53,7 +51,7 @@ public class mapService {
         HashMap<String, Object> result = new HashMap<>();
         MidPoint midPoint = new MidPoint();
 
-        // (1) 거리순 (2) 무게중심 (3) 교통점수순
+        // (1) 직선거리순 (2) 무게중심 (3) 교통점수순
         if(option == 1){
             result = midPoint.distance(lat, lon);
         }
@@ -116,25 +114,6 @@ public class mapService {
             createCookie(response, cookieName, users.get(i-1)); // 쿠키 생성
         }
 
-        // 쿠키 출력
-        Cookie[] cookies = request.getCookies();
-        try{
-            if(cookies != null){
-                for(Cookie cookie : cookies){
-                    if(cookie.getName().contains("USER")){
-                        // 쿠키에 사용자정보가 있을 경우
-                        System.out.println(cookie.getName() + " : " + URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
-
-                    }
-
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-
         return result;
     }
 
@@ -186,15 +165,9 @@ public class mapService {
      * 내용 : 재탐색 Service
      **/
     public HashMap<String, Object> reSearchPoint( HashMap<String,Object> params){
-//        Random random = new Random();
-        System.out.println("reSearchPoint - params : " + params);
         HashMap<String ,Object> result = new HashMap<>();
         try{
             result = mapdao.reSearchPoint(params);
-//            List<HashMap<String, Object>> ex = mapdao.reSearchPoint(params); // 시도, 시군구, 관광지 옵션들을 검색하여 여러 목록 값을 반환
-//            int randomNumber = random.nextInt(ex.size()); // 0부터 데이터베이스에서 데이터를 가져온 갯수까지 숫자 중에서 랜덤으로 정수를 하나 생성
-//            result = ex.get(randomNumber); // 랜덤으로 생성된 수로 관광지 장소 하나를 반환
-            System.out.println("result : " + result );
         } catch (Exception e) {
             result.put("response", 0); // 검색 결과가 없을 경우 null 반환
             e.printStackTrace();

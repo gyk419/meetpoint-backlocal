@@ -11,80 +11,19 @@ public class MidPoint {
     /**
      +     * 작성일 : 2024.04.10
      +     * 작성자 : 김준식
-     +     * 내용 : 거리순
+     +     * 내용 : 직선거리순
      +     **/
     public HashMap<String, Object> distance(List<Double> latitude, List<Double> longitude) {
-        List<Point> points = new ArrayList<>();
         HashMap<String, Object> resultValue = new HashMap<>();
-        for(int i = 0; i < latitude.size(); i++){
-            points.add(new Point(latitude.get(i), longitude.get(i)));
-        }
-        System.out.println("midpoint 첫번째");
-
-        // 평균 이동 알고리즘 적용
-       List<Point> result = meanShift(points, 1.0, 0.05);
-
-        // 수렴한 중간 지점들 출력
-        System.out.println("수렴한 중간 지점들:");
-        for (Point centroid : result) {
-           System.out.println("(" + centroid.lat + ", " + centroid.lon + ")");
-        }
-        Point centroid  = result.get(result.size()-1);
-        resultValue.put("latitude", centroid.lat);
-        resultValue.put("longitude", centroid.lon);
+        double latSum = 0.0; // 위도값들의 합
+        double lngSum = 0.0; // 경도값들의 합
+        // 두 개 좌표의 위도와 경도값을 더한 후 2로 나누어 직선거리의 중간값(위도, 경도)를 구함.
+        latSum = latitude.get(0) + latitude.get(1);
+        lngSum = longitude.get(0) + longitude.get(1);
+        resultValue.put("latitude", String.format("%.15f", latSum / 2 ));
+        resultValue.put("longitude", String.format("%.15f", lngSum / 2 ));
         return resultValue;
     }
-    public static double euclideanDistance(Point a, Point b) {
-        // 두 점 사이의 유클리드 거리를 계산하는 메서드
-                double dx = a.lon - b.lon;
-        double dy = a.lat - b.lat;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    public static Point findNewCentroid(Point point, List<Point> points, double kernelBandwidth) {
-        // 주어진 점에 대해 새로운 중심을 찾는 메서드
-        double[] weights = new double[points.size()];
-        for (int i = 0; i < points.size(); i++) {
-            double distance = euclideanDistance(point, points.get(i));
-            weights[i] = Math.exp(-0.5 * Math.pow(distance / kernelBandwidth, 2));
-        }
-
-        double sumLat = 0;
-        double sumLon = 0;
-        double sumWeights = 0;
-
-        for (int i = 0; i < points.size(); i++) {
-            sumLat += points.get(i).lat * weights[i];
-            sumLon += points.get(i).lon * weights[i];
-            sumWeights += weights[i];
-        }
-
-        double newLat = sumLat / sumWeights;
-        double newLon = sumLon / sumWeights;
-
-        return new Point(newLat, newLon);
-    }
-
-    public static List<Point> meanShift(List<Point> points, double kernelBandwidth, double convergenceThreshold) {
-        // 평균 이동 알고리즘을 수행하는 메서드
-        List<Point> centroids = new ArrayList<>(points);
-
-        for (int i = 0; i < centroids.size(); i++) {
-        Point point = centroids.get(i);
-        while (true) {
-                Point newCentroid = findNewCentroid(point, points, kernelBandwidth);
-                double shift = euclideanDistance(newCentroid, point);
-                if (shift < convergenceThreshold) {
-                        centroids.set(i, newCentroid);
-                        break;
-                    }
-                point = newCentroid;
-            }
-        }
-
-        return centroids;
-    }
-
 
      /**
       * 작성일 : 2024.03.29
@@ -214,16 +153,12 @@ public class MidPoint {
         HashMap<String, Object> middlePoint = grahamScan(latitude,longitude); // 중간 좌표
         double mpLat = Double.parseDouble(middlePoint.get("latitude").toString()); // 중간좌표 위도
         double mpLon = Double.parseDouble(middlePoint.get("longitude").toString()); // 중간좌표 경도
-        System.out.println("maLat : " + mpLat);
-        System.out.println("mpLon : " + mpLon);
         HashMap<String, Object> result = new HashMap<>(); // 결과 반환
 
         // 똑같은 점수를 받은 좌표들이 없을 경우 1(즉, 점수가 다 다를 경우)
         if (optionValue == 1) {
             double newLat = Math.abs(mpLat - lowScoreLat) / 3; // (중간좌표의 위도값 - 교통점수가 낮은 좌표의 위도 값) / 3을 하여 3분의 1지점 지정
             double newLon = Math.abs(mpLon - lowScoreLon) / 3; // (중간좌표의 경도값 - 교통점수가 낮은 좌표의 경도 값) / 3을 하여 3분의 1지점 지정
-            System.out.println("newLat: " + newLat);
-            System.out.println("newLon: " + newLon);
 
             //중간좌표와 점수가 낮은 좌표의 위도가 같을 경우 ( 중간좌표 위도 == 낮은 점수 좌표 위도)
             if(mpLat == lowScoreLat){

@@ -1,6 +1,8 @@
 package MeetPoint.meetpoint.Map.service;
 
 import MeetPoint.meetpoint.Map.dao.UserChoiceDao;
+import MeetPoint.meetpoint.config.WebConfig;
+import MeetPoint.meetpoint.util.AES256;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,9 @@ import java.util.List;
 public class UserChoiceService {
     @Autowired
     UserChoiceDao userChoiceDao;
+
+    @Autowired
+    WebConfig webConfig;
 
     /**
      * 작성일 : 2024.05.17
@@ -47,7 +52,7 @@ public class UserChoiceService {
                 userChoiceDao.storePlaceToVisit(place);
             }
             // 결과값은 중간지점을 저장한 인덱스(id)를 반환
-            result.put("index", idx);
+            result.put("index", encryptData(idx.toString()));
         } catch (Exception e){
             result.put("index", -1);
             e.printStackTrace();
@@ -61,9 +66,9 @@ public class UserChoiceService {
      * 작성자 : 김준식
      * 내용 : 사용자가 선택한 장소 및 중간 지점명, 위도, 경도값 반환
      **/
-    public HashMap<String, Object> selectPlace(HashMap<String, Integer> params){
+    public HashMap<String, Object> selectPlace(HashMap<String, Object> params){
         HashMap<String, Object> result = new HashMap<>();
-
+        params.put("index", Long.valueOf(decryptData(params.get("index").toString())));
         // 중간지점명, 중간지점 위도, 경도, 건물명 조회
         result = userChoiceDao.selectMeetPoint(params);
 
@@ -73,10 +78,34 @@ public class UserChoiceService {
 
         List<HashMap<String, Object>> selectTime = userChoiceDao.selectStayTime(params);
         result.put("addCheckInfoList", selectTime);
-        System.out.println("result : " + result);
 
         return result;
+    }
 
+    /**
+     * 작성일 : 2024.05.25
+     * 작성자 : 김준식
+     * 내용 : AES256 암호화
+     **/
+    public String encryptData(String data){
+        try{
+            return AES256.encrypt(data, webConfig.getSecretKey());
+        } catch (Exception e) {
+            throw new RuntimeException("Error encryptData",e);
+        }
+    }
+
+    /**
+     * 작성일 : 2024.05.25
+     * 작성자 : 김준식
+     * 내용 : AES256 복호화
+     **/
+    public String decryptData(String encryptData) {
+        try {
+            return AES256.decrypt(encryptData, webConfig.getSecretKey());
+        } catch (Exception e) {
+            throw new RuntimeException("Error decryptData", e);
+        }
     }
 
 }

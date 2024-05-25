@@ -1,6 +1,6 @@
 package MeetPoint.meetpoint.Map.controller;
 
-import MeetPoint.meetpoint.Map.service.mapService;
+import MeetPoint.meetpoint.Map.service.MapService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +14,7 @@ import java.util.List;
 public class MapController {
 
     @Autowired
-    mapService mapService;
-
-    @GetMapping
-    public String webView(){
-        System.out.println("webView 실행");
-        return mapService.webView();
-    }
+    MapService mapService;
 
     /**
      * 작성일 : 2024.04.01
@@ -29,7 +23,6 @@ public class MapController {
      **/
     @PostMapping("/mainPage")
     public HashMap<String, Object> calCenterPoint(@RequestBody List<Object> params, HttpServletResponse response, HttpServletRequest request) {
-        System.out.println("findCenterPoint - Controller 실행");
         return mapService.findCenterPoint(params, response, request);
     }
 
@@ -40,7 +33,6 @@ public class MapController {
      **/
     @PostMapping("/reSearchPoint")
     public HashMap<String, Object> reSearchPoint(@RequestBody HashMap<String, Object> params){
-        System.out.println("reSearchPoint - Controller 실행");
         return mapService.reSearchPoint(params);
     }
 }

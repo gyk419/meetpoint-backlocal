@@ -3,7 +3,6 @@ package MeetPoint.meetpoint.Map.dao;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * 작성일 : 2024.04.06

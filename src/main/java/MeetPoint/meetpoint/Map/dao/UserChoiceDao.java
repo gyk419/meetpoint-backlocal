@@ -40,19 +40,19 @@ public interface UserChoiceDao {
      * 작성자 : 김준식
      * 내용 : 중간 주소, 위도, 경도, 건물명 데이터 조회
      **/
-    public HashMap<String, Object> selectMeetPoint(HashMap<String, Integer> params);
+    HashMap<String, Object> selectMeetPoint(HashMap<String, Object> params);
 
     /**
      * 작성일 : 2024.05.21
      * 작성자 : 김준식
      * 내용 : 사용자가 선택한 장소 데이터 조회
      **/
-    public List<HashMap<String, Object>> selectPlace(HashMap<String, Integer> params);
+    List<HashMap<String, Object>> selectPlace(HashMap<String, Object> params);
 
     /**
      * 작성일 : 2024.05.21
      * 작성자 : 김준식
      * 내용 : 사용자가 선택한 장소에 머물 시간 데이터 조회
      **/
-    public List<HashMap<String, Object>> selectStayTime(HashMap<String, Integer> params);
+    List<HashMap<String, Object>> selectStayTime(HashMap<String, Object> params);
 }

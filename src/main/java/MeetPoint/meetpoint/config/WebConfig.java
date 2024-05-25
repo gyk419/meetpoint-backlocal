@@ -1,5 +1,6 @@
 package MeetPoint.meetpoint.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -17,5 +18,17 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowedMethods("GET", "POST");
+    }
+
+    /*******************
+     * 날짜 : 2024.05.25
+     * 이름 : 김준식
+     * 내용 : 비밀 키
+     * *****************/
+    @Value("${aes.secret.key")
+    private String secretKey;
+
+    public String getSecretKey() {
+        return secretKey;
     }
 }
