@@ -52,7 +52,8 @@ public class UserChoiceService {
                 userChoiceDao.storePlaceToVisit(place);
             }
             // 결과값은 중간지점을 저장한 인덱스(id)를 반환
-            result.put("index", encryptData(idx.toString()));
+            result.put("index", encryptData(idx.toString()).trim());
+            System.out.println("index" + result.get("index"));
         } catch (Exception e){
             result.put("index", -1);
             e.printStackTrace();
@@ -68,7 +69,7 @@ public class UserChoiceService {
      **/
     public HashMap<String, Object> selectPlace(HashMap<String, Object> params){
         HashMap<String, Object> result = new HashMap<>();
-        params.put("index", Long.valueOf(decryptData(params.get("index").toString())));
+        params.put("index", Long.valueOf(decryptData(params.get("index").toString().trim())));
         // 중간지점명, 중간지점 위도, 경도, 건물명 조회
         result = userChoiceDao.selectMeetPoint(params);
 
