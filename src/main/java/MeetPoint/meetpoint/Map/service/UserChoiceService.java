@@ -53,7 +53,6 @@ public class UserChoiceService {
             }
             // 결과값은 중간지점을 저장한 인덱스(id)를 반환
             result.put("index", encryptData(idx.toString()).trim());
-            System.out.println("index" + result.get("index"));
         } catch (Exception e){
             result.put("index", -1);
             e.printStackTrace();
