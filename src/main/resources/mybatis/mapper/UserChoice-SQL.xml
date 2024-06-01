@@ -26,8 +26,8 @@
 	내용 : 사용자가 선택한 장소들을 저장.
     -->
     <insert id="storePlace" parameterType="HashMap">
-        INSERT INTO user_choice.selected_place (PLACE_LOCATION, PLACE_NM, PLACE_PHONE_NUM, PLACE_URL, MP_ID)
-        VALUES ( #{location}, #{name}, #{phone}, #{placeUrl}, #{MP_ID} );
+        INSERT INTO user_choice.selected_place (PLACE_LOCATION, PLACE_NM, PLACE_PHONE_NUM, PLACE_URL, PLACE_LAT, PLACE_LON, MP_ID)
+        VALUES ( #{location}, #{name}, #{phone}, #{placeurl}, #{placey}, #{placex}, #{MP_ID} );
     </insert>
 
     <!--
@@ -62,7 +62,7 @@
     내용 : 사용자가 선택한 장소 조회.
     -->
     <select id="selectPlace" resultType="HashMap" parameterType="HashMap">
-        SELECT PLACE_LOCATION as location, PLACE_NM as name, PLACE_PHONE_NUM as phone, PLACE_URL as placeUrl
+        SELECT PLACE_LOCATION as location, PLACE_NM as name, PLACE_PHONE_NUM as phone, PLACE_URL as placeUrl, PLACE_LAT as placeY, PLACE_LON as placeX
         FROM user_choice.selected_place
         WHERE MP_ID = #{index}
     </select>
@@ -73,7 +73,7 @@
     내용 : 사용자가 선택한 장소의 머무는 시간 조회.
     -->
     <select id="selectStayTime" resultType="HashMap" parameterType="HashMap">
-        SELECT sp.PLACE_LOCATION as location, sp.PLACE_NM as name, sp.PLACE_PHONE_NUM as phone, sp.PLACE_URL as placeUrl,
+        SELECT sp.PLACE_LOCATION as location, sp.PLACE_NM as name, sp.PLACE_PHONE_NUM as phone, sp.PLACE_URL as placeUrl, sp.PLACE_LAT as placeY, sp.PLACE_LON as placeX,
                pv.PV_HOUR as hour, pv.PV_MINUTE as minute
         FROM user_choice.selected_place AS sp
             JOIN user_choice.stay_time_places_to_visit AS pv ON sp.ID = pv.SP_ID
