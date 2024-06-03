@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	작성일 : 2024.03.16
+	작성자 : 김준식
+	내용 : 교통 정보 입니다.
+ -->
+<mapper namespace="MeetPoint.meetpoint.Map.dao.MapDao">
+
+    <!--
+	작성일 : 2024.03.16
+	작성자 : 김준식
+	내용 : 버스 정류장 개수
+    -->
+    <select id="busStopCount" parameterType="HashMap" resultType="int" >
+        SELECT COUNT(*)
+        FROM transport.bus_stop
+        WHERE gps_lati BETWEEN #{latitude} - 0.00087513268667 AND #{latitude} + 0.00087513268667
+            AND gps_long BETWEEN #{longitude} - 0.01071627787172 AND #{longitude} + 0.01071627787172;
+    </select>
+
+    <!--
+	작성일 : 2024.05.06
+	작성자 : 김준식
+	내용 : 관광지 정보 반환(관광지명, 행정구역, 위도, 경도 등)
+    -->
+    <select id="reSearchPoint" parameterType="HashMap" resultType="HashMap">
+        SELECT POI_NM as Name,LC_LA as Latitude, LC_LO as Longitude
+        FROM tour.a_tourist_spot
+        WHERE
+            <foreach collection="option" item="item"  separator="AND" >
+                <choose>
+                    <when test="num == 0 and region_1depth_name != '' and region_2depth_name == '' ">
+                        CTPRVN_NM = #{region_1depth_name} AND CL_NM LIKE '%' || #{item} || '%'
+                    </when>
+                    <when test="num == 0 and region_2depth_name != '' and region_1depth_name != '' ">
+                       ( CTPRVN_NM = #{region_1depth_name} AND CL_NM LIKE '%' || #{item} || '%' ) OR (CTPRVN_NM = #{region_1depth_name} AND SIGNGU_NM = #{region_2depth_name} AND CL_NM LIKE '%' || #{item} || '%' )
+                    </when>
+                    <when test="num == 1 and region_1depth_name != '' and region_2depth_name != '' ">
+                        CTPRVN_NM = #{region_1depth_name} AND SIGNGU_NM = #{region_2depth_name} AND CL_NM LIKE '%' || #{item} || '%'
+                    </when>
+                </choose>
+            </foreach>
+        ORDER BY RANDOM()
+        LIMIT 1
+    </select>
+
+</mapper>

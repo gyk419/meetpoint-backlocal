@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	작성일 : 2024.05.17
+	작성자 : 김준식
+	내용 : 사용자가 선택한 정보 입니다.
+ -->
+<mapper namespace="MeetPoint.meetpoint.Map.dao.UserChoiceDao">
+    <!--
+	작성일 : 2024.05.17
+	작성자 : 김준식
+	내용 : 중간지점 주소, 중간지점 위도와 경도, 건물명을 저장하고 해당 인덱스(id) 반환.
+    -->
+    <insert id="storeMP" parameterType="HashMap" useGeneratedKeys="true" keyProperty="id">
+<!--        <selectKey keyProperty="id" order="AFTER" resultType="int">-->
+<!--            SELECT NEXTVAL('user_choice.schedule_locations_id_seq')-->
+<!--        </selectKey>-->
+        INSERT INTO user_choice.schedule_locations (MP_NM, MP_LAT, MP_LON, MP_BUILDING_NM, TOTAL_HOUR, TOTAL_MINUTE  )
+        VALUES ( #{meetPoint}, #{mpLat}, #{mpLon}, #{buildingName}, #{stayTimeHour}, #{stayTimeMinute} );
+    </insert>
+
+    <!--
+	작성일 : 2024.05.18
+	작성자 : 김준식
+	내용 : 사용자가 선택한 장소들을 저장.
+    -->
+    <insert id="storePlace" parameterType="HashMap">
+        INSERT INTO user_choice.selected_place (PLACE_LOCATION, PLACE_NM, PLACE_PHONE_NUM, PLACE_URL, PLACE_LAT, PLACE_LON, MP_ID)
+        VALUES ( #{location}, #{name}, #{phone}, #{placeurl}, #{placey}, #{placex}, #{MP_ID} );
+    </insert>
+
+    <!--
+	작성일 : 2024.05.20
+	작성자 : 김준식
+	내용 : 방문할 장소들을 저장.
+    -->
+    <insert id="storePlaceToVisit" parameterType="HashMap">
+        INSERT INTO user_choice.stay_time_places_to_visit (PV_HOUR, PV_MINUTE, SP_ID)
+        VALUES (
+                #{hour}, #{minute},
+                (select id
+                 from user_choice.selected_place
+                 where PLACE_LOCATION = #{location} and MP_ID = #{MP_ID})
+                );
+    </insert>
+
+    <!--
+    작성일 : 2024.05.21
+    작성자 : 김준식
+    내용 : 사용자가 선택한 중간지점 데이터 조회.
+    -->
+    <select id="selectMeetPoint" resultType="HashMap" parameterType="HashMap">
+        SELECT MP_NM as meetPoint, MP_LAT as lat, MP_LON as lon, MP_BUILDING_NM as mpBuildingName, TOTAL_HOUR as stayTimeHour, TOTAL_MINUTE as stayTimeMinute
+        FROM user_choice.schedule_locations
+        WHERE ID = #{index}
+    </select>
+
+    <!--
+    작성일 : 2024.05.21
+    작성자 : 김준식
+    내용 : 사용자가 선택한 장소 조회.
+    -->
+    <select id="selectPlace" resultType="HashMap" parameterType="HashMap">
+        SELECT PLACE_LOCATION as location, PLACE_NM as name, PLACE_PHONE_NUM as phone, PLACE_URL as placeUrl, PLACE_LAT as placeY, PLACE_LON as placeX
+        FROM user_choice.selected_place
+        WHERE MP_ID = #{index}
+    </select>
+
+    <!--
+    작성일 : 2024.05.21
+    작성자 : 김준식
+    내용 : 사용자가 선택한 장소의 머무는 시간 조회.
+    -->
+    <select id="selectStayTime" resultType="HashMap" parameterType="HashMap">
+        SELECT sp.PLACE_LOCATION as location, sp.PLACE_NM as name, sp.PLACE_PHONE_NUM as phone, sp.PLACE_URL as placeUrl, sp.PLACE_LAT as placeY, sp.PLACE_LON as placeX,
+               pv.PV_HOUR as hour, pv.PV_MINUTE as minute
+        FROM user_choice.selected_place AS sp
+            JOIN user_choice.stay_time_places_to_visit AS pv ON sp.ID = pv.SP_ID
+        WHERE sp.MP_ID = #{index}
+    </select>
+</mapper>
